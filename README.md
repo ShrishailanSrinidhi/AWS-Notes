@@ -443,7 +443,7 @@ We can authenticate to your DB instance using AWS Identity and Access Management
 1. Aurora replica (up to 15)
 2. MySQL Read Replica (up to 5)
 
-![f359d3f1bbec4184d58819de90dfce9c.png](../_resources/f359d3f1bbec4184d58819de90dfce9c.png)
+![f359d3f1bbec4184d58819de90dfce9c.png](f359d3f1bbec4184d58819de90dfce9c.png "Title")
 
 **Global Database**
 For globally distributed applications you can use Global Database, where a single Aurora database can span multiple AWS regions to enable fast local reads and quick disaster recovery. Global Database uses storage-based replication to replicate a database across multiple AWS Regions, with typical latency of less than 1 second.
@@ -480,9 +480,9 @@ The storage volume consists of **six storage nodes** placed in **three Availabil
 6. Automated backups are deleted when you delete the RDS DB instance.
 7. Automated backups are only supported for InnoDB storage engine for MySQL (not for myISAM).
 
-![2799fa8220a1543c48e60f7cc9017a73.png](../_resources/2799fa8220a1543c48e60f7cc9017a73.png)
+![2799fa8220a1543c48e60f7cc9017a73.png](2799fa8220a1543c48e60f7cc9017a73.png "Title")
 
-![735e56a0baa72d19163f1de624578dca.png](../_resources/735e56a0baa72d19163f1de624578dca.png)
+![735e56a0baa72d19163f1de624578dca.png](735e56a0baa72d19163f1de624578dca.png "Title")
 
 # Dynamo DB
 Amazon DynamoDB is a fully managed NoSQL database service that provides fast and predictable performance with seamless scalability.
@@ -512,7 +512,7 @@ Fully managed in-memory cache for DynamoDB that increases performance (microseco
 DynamoDB Streams captures a time-ordered sequence of item-level modifications in any DynamoDB table and stores this information in a log for up to 24 hours. Events are recorded in near real-time.
 
 **Dynamo DB Global Tables**
-![a270b13e897b529f28492de5454854e5.png](../_resources/a270b13e897b529f28492de5454854e5.png)
+![a270b13e897b529f28492de5454854e5.png](a270b13e897b529f28492de5454854e5.png "Title")
 
 **Access Control**
 All authentication and access control is managed using IAM.
@@ -529,7 +529,7 @@ In DynamoDB, the primary resources are tables. Additional resource types, indexe
 1. **Memcached** – simplest model, can run large nodes with multiple cores/threads, can be scaled in and out, can cache objects such as DBs.
 2. **Redis** – complex model, supports encryption, master / slave replication, cross AZ (HA), automatic failover and backup/restore.
 
-![94954fa441365b3228e2b8f81dcec4a0.png](../_resources/94954fa441365b3228e2b8f81dcec4a0.png)
+![94954fa441365b3228e2b8f81dcec4a0.png](94954fa441365b3228e2b8f81dcec4a0.png "Title")
 
 # Patterns
 **Lazy Loading**
