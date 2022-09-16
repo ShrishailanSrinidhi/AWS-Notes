@@ -645,3 +645,214 @@ Amazon Kinesis Data Analytics is the easiest way to process and analyze real-tim
 # AWS Glue
 AWS Glue is just a serverless ETL service that crawls your data, builds a data catalog, performs data preparation, data transformation, and data ingestion. It won't allow you to utilize different big data frameworks effectively, unlike Amazon EMR.
 
+# Elastic Block Store (EBS)
+Amazon Elastic Block Store (Amazon EBS) provides block level storage volumes for use with EC2 instances. EBS volumes behave like raw, unformatted block devices.
+- You can have up to 5,000 EBS volumes by default.
+- You can have up to 10,000 snapshots by default.
+
+When you create an encrypted EBS volume and attach it to a supported instance type, the following types of data are encrypted:
+1. Data at rest inside the volume
+2. All data moving between the volume and the instance
+3. All snapshots created from the volume
+4. All volumes created from those snapshots
+
+ Amazon EBS is recommended for data that must be quickly accessible and requires long-term persistence. EBS volumes are particularly well-suited for use as the primary storage for file systems, databases, or for any applications that require fine granular updates and access to raw, unformatted, block-level storage. Amazon EBS is well suited to both database-style applications that rely on random reads and writes, and to throughput-intensive applications that perform long, continuous reads and writes.
+ 
+ ## Features
+ - It is AZ locked i.e. EBS created in one AZ will not be available in other AZ.
+-  To make a volume available outside of the Availability Zone, we can create a snapshot and restore that snapshot to a new volume anywhere in that Region. You can copy snapshots to other Regions and then restore them to new volumes there, making it easier to leverage multiple AWS Regions for geographical expansion, data center migration, and disaster recovery.
+
+## Instance Store
+- An instance store provides temporary block-level storage for your instance. This storage is located on disks that are physically attached to the host computer. 
+-  Instance store is ideal for temporary storage of information that changes frequently, such as buffers, caches, scratch data, and other temporary content, or for data that is replicated across a fleet of instances, such as a load-balanced pool of web servers.
+-  You can specify instance store volumes for an instance only when you launch it. You can't detach an instance store volume from one instance and attach it to a different instance.
+-  ELB is designed to only run in one region and not across multiple regions.
+-  EBS volumes are only encrypted using AWS KMS. Server-side encryption (SSE) is actually an option for Amazon S3.
+
+**EBS volume trype**
+1. SSD, General Purpose – gp2/gp3
+2. SSD, Provisioned IOPS – io1/io2
+3. HDD, Throughput Optimized – (st1)
+4. HDD, Cold – (sc1)
+5. EBS optimized instances
+
+**SSD, General Purpose – gp2/gp3**
+General Purpose SSD volume that balances price performance for a wide variety of transactional workloads.
+
+Use cases:
+- Boot volumes, low-latency interactive apps, dev & test.
+- EBS multi-attach not supported.
+
+**SSD, Provisioned IOPS – io1/io2**
+Highest performance SSD volume designed for latency-sensitive transactional workloads
+
+Use cases:
+- Workloads that require sustained IOPS performance or more than 16,000 IOPS.
+- I/O-intensive NoSQL and relational databases.
+- EBS multi-attach supported.
+
+**HDD, Throughput Optimized – (st1)**
+Low-cost HDD volume, designed for frequently accessed. Throughput intensive workloads
+
+- Frequently accessed, throughput intensive workloads with large datasets and large I/O sizes, such as MapReduce, Kafka, log processing, data warehouse, and ETL workloads.
+- Cannot be a boot volume.
+- EBS multi-attach not supported.
+
+Use case:
+- Big-data, data warehouses, log processing.
+
+**HDD, Cold – (sc1)**
+Lowest cost HDD volume designed for less frequently accessed workloads
+- Lowest cost storage – cannot be a boot volume.
+- Less frequently accessed workloads with large, cold datasets.
+- Cannot be a boot volume.
+- EBS multi-attach not supported.
+
+Use case:
+- Colder data requiring fewer scans per day.
+
+**EBS optimized instances**
+- Dedicated capacity for Amazon EBS I/O.
+- EBS-optimized instances are designed for use with all EBS volume types.
+- Additional hourly fee.
+- Available for select instance types.
+- Some instance types have EBS-optimized enabled by default.
+
+# EBS Encryption
+ When you create an encrypted EBS volume and attach it to a supported instance type, the following types of data are encrypted:
+1.  Data at rest inside the volume.
+2. All data moving between the volume and the instance.
+3. All snapshots created from the volume.
+4. All volumes created from those snapshots.
+
+## EBS Snapshots
+1. Snapshots are created asynchronously and are incremental.
+2. You can copy unencrypted snapshots (optionally encrypt).
+3. You can copy an encrypted snapshot (optionally re-encrypt with a different key).
+4. Snapshot copies receive a new unique ID.
+5. You can copy within or between regions.
+6. You cannot move snapshots, only copy them.
+7. You cannot take a copy of a snapshot when it is in a “pending” state, it must be “complete”.
+8. S3 Server Side Encryption (SSE) protects data in transit while copying.
+9. User defined tags are not copied.
+10. You can have up to 5 snapshot copy requests running in a single destination per account.
+11. You can copy Import/Export service, AWS Marketplace, and AWS Storage Gateway snapshots.
+12. If you try to copy an encrypted snapshot without having access to the encryption keys it will fail silently (cross-account permissions are required).
+
+**Use case for copying snapshots**
+- Creating services in other regions.
+- DR – the ability to restore from snapshot in another region.
+- Migration to another region.
+- Applying encryption.
+- Data retention.
+
+**Snapshot of RAID arrays**
+1. Stop the application from writing to disk.
+2. Flush all caches to the disk.
+3. Freeze the filesystem.
+4. Unmount the RAID array.
+5. Shut down the associated EC2 instance.
+
+# Monitoring and Reporting
+There are two types of Amazon CloudWatch monitoring available for Amazon EBS volumes:
+**1. Basic** – Data is available automatically in 5-minute periods at no charge. This includes data for the root device volumes for EBS-backed instances.
+**2. Detailed** – Provisioned IOPS SSD (io1) volumes automatically send one-minute metrics to CloudWatch.
+
+- Amazon EBS General Purpose SSD (gp2), Throughput Optimized HDD (st1) , Cold HDD (sc1), and Magnetic (standard) volumes automatically send five-minute metrics to CloudWatch.
+- Provisioned IOPS SSD (io1) volumes automatically send one-minute metrics to CloudWatch.
+- Data is only reported to CloudWatch when the volume is attached to an instance.
+
+# EFS
+Amazon Elastic File System (Amazon EFS) provides a simple, serverless, set-and-forget elastic file system for use with AWS Cloud services and on-premises resources.
+- Amazon EFS supports the Network File System version 4 (NFSv4.1 and NFSv4.0) protocol
+- Multiple compute instances, including Amazon EC2, Amazon ECS, and AWS Lambda, can access an Amazon EFS file system at the same time.
+- Data is stored across multiple AZs within a region.
+- Need to create mount targets and choose AZs to include.
+
+ ## Amazon EFS offers a range of storage classes designed for different use cases:
+**Standard storage classes** – EFS Standard and EFS Standard–Infrequent Access (Standard–IA), which offer multi-AZ resilience and the highest levels of durability and availability.
+**One Zone storage classes** – EFS One Zone and EFS One Zone–Infrequent Access (EFS One Zone–IA), which offer customers the choice of additional savings by choosing to save their data in a single Availability Zone.
+
+## Amazon EFS Performance
+**Performance Modes**
+1. “General Purpose” performance mode is appropriate for most file systems.
+2. “Max I/O” performance mode is optimized for applications where tens, hundreds, or thousands of EC2 instances are accessing the file system.
+
+## Throughput Modes
+1. **Burst Throughput:** Throughput scales as your file system grows.
+2. **Provisioned Throughput:** Throughput is fixed at the specified amount.
+
+# Amazon EFS Encryption
+- EFS offers the ability to encrypt data at rest and in transit.
+- Encryption keys are managed by the AWS Key Management Service (KMS).
+
+## Encryption in Transit
+- Data encryption in transit uses Transport Layer Security (TLS) 1.2 to encrypt data sent between your clients and EFS file systems.
+- Encryption in transit is enabled when mounting the file system.
+
+## Encryption at rest
+1. Enable encryption at rest in the EFS console or by using the AWS CLI or SDKs.
+2. Encryption at rest MUST be enabled at file system creation time.
+3. Data encrypted at rest is transparently encrypted while being written, and transparently decrypted while being read.
+
+# FSx for Windows
+![e94b23bf255900a3a6e0683f1cab225b.png](e94b23bf255900a3a6e0683f1cab225b.png "Title")
+
+# FSx for Lustre
+![92b0088f9f4ac5980ada2987c0a8c8f2.png](92b0088f9f4ac5980ada2987c0a8c8f2.png "Title")
+
+# FSx File system Deployment Options
+![a218c9673540ad90db8dcd009b1a1be4.png](a218c9673540ad90db8dcd009b1a1be4.png "Title")
+
+
+# Glacier
+## Data Transfer from Snowball into Glacier
+![eaf9a218ff2943b019a27be116c0d5f6.png](eaf9a218ff2943b019a27be116c0d5f6.png "Title")
+
+![3f68d03d693c9b233f612c28204e8df2.png](3f68d03d693c9b233f612c28204e8df2.png "Title")
+
+## Retrieval Options in Glacier
+1. **Expedited:** Retrieval in 1-5 mins if data retrieved is <250MB.
+2. **Standard:** 3-5 hours, no limit on data size.
+3. **Bulk:** To retrieve petabyte of data and takes 5-12 hrs.
+
+There are 2 types of Hybrid Cloud Storage:
+1. AWS Storage Gateway
+2. AWS Snow Family
+
+# AWS Storage Gateway
+It is a hybrid cloud storage service that gives you on-premises access to virtually unlimited cloud storage. You can use Storage Gateway to simplify storage management and reduce costs for key hybrid cloud storage use cases. These include moving backups to the cloud, using on-premises file shares backed by cloud storage, and providing low-latency access to data in AWS for on-premises applications.
+
+The service provides four different types of gateways:
+1. Tape Gateway
+2. Amazon S3 File Gateway,
+3. Amazon FSx File Gateway
+4. Volume Gateway
+
+## Storage Gateway
+![a29dffa14b0ab6044022d6bbc966c9c8.png](a29dffa14b0ab6044022d6bbc966c9c8.png "Title")
+
+# File Gateway
+Amazon File Gateway presents a file interface that enables you to store files as objects in Amazon S3 using the industry-standard NFS and SMB file protocols, and access those files via NFS and SMB from your data center or Amazon EC2, or access those files as objects directly in Amazon S3. Once objects are transferred to S3, they can be managed as native S3 objects and bucket policies such as lifecycle management and Cross-Region Replication (CRR), and can be applied directly to objects stored in your bucket.
+
+![f7095902b2af1f73954d33dd3298e93d.png](f7095902b2af1f73954d33dd3298e93d.png "Title")
+
+# Amazon FSx File Gateway
+![3a63cfc551d7a9624778a17136cb9a48.png](3a63cfc551d7a9624778a17136cb9a48.png "title")
+
+# Tape Gateway
+Tape Gateway presents an iSCSI-based virtual tape library (VTL) of virtual tape drives and a virtual media changer to your on-premises backup application. It is compatible with most leading backup applications, so you can continue using your tape-based backup workflows.
+- You can access your data stored as virtual tapes in AWS through a Tape Gateway running in AWS or in your data center over the network.
+-  You pay only for the capacity you use and scale as your needs grow.
+- For any petabyte-scale tape data migration needs you can use a Snowball Edge Storage Optimized device with Tape Gateway to move your physical tape data to either S3 Glacier Flexible Retrieval or S3 Glacier Deep Archive.
+- 
+![56fdd6858dacf7ee1ca5013d42ea84cf.png](56fdd6858dacf7ee1ca5013d42ea84cf.png "Title")
+
+# Volume Gateway
+![2de1e8c40f7caaf8b8d6b70d9b4fb141.png](2de1e8c40f7caaf8b8d6b70d9b4fb141.png "Title")
+
+# Summary
+
+![260bb7c8a099fdc266325ffa760c5d72.png](260bb7c8a099fdc266325ffa760c5d72.png "Title")
+
+![c626d71f5fc007bb33bf54ceba75b60b.png](c626d71f5fc007bb33bf54ceba75b60b.png "Title")
