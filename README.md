@@ -344,7 +344,7 @@ The functions run in response to CloudFront events, without provisioning or mana
 6. Automatic failover for Multi-AZ option.
 7. Read replicas option for read heavy workloads.
 
-![0863418b56b4063ec9793a082ee5a786.png](../_resources/0863418b56b4063ec9793a082ee5a786.png)
+![0863418b56b4063ec9793a082ee5a786.png](0863418b56b4063ec9793a082ee5a786.png "Title")
 
 You can have up to 40 Amazon RDS DB instances, with the following limitations:
 1. 10 for each SQL Server edition (Enterprise, Standard, Web, and Express) under the "license-included" model
@@ -425,7 +425,7 @@ We can authenticate to your DB instance using AWS Identity and Access Management
 - Schema Conversion Tool can copy database schemas for homogenous migrations (same database) and convert schemas for heterogeneous migrations (different database).
 
 # RDS Conversion from Single AZ to Multi AZ
-![ffc002770543960740d3040276f63e09.png](../_resources/ffc002770543960740d3040276f63e09.png)
+![ffc002770543960740d3040276f63e09.png](ffc002770543960740d3040276f63e09.png "Title")
 
 # Monitoring, Logging and Reporting
 **1. Amazon RDS Events** – Subscribe to Amazon RDS events to be notified when changes occur with a DB instance, DB snapshot, DB parameter group, or DB security group.
