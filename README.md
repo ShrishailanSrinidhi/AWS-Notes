@@ -405,8 +405,12 @@ We can authenticate to your DB instance using AWS Identity and Access Management
 - If data goes from one AZ to another then it is charged. Data transfer within AZ no charge.
 
 # DBsnapshots
+- Automatic backup can be stored from 0 to 35 days max.
 - DB Snapshots are user-initiated and enable you to back up your DB instance in a known state as frequently as you wish, and then restore to that specific state.
 - Cannot be used for point-in-time recovery.
+- Manual backup can be taken from secondary database so there is no downtime of database.
+- OS and DB patching can require taking the database offline.
+- By default maintenance is set for weekly, we can change it.
 - Snapshots are stored on S3.
 - Snapshots remain on S3 until manually deleted.
 - Can restore up to the last 5 minutes.
@@ -424,8 +428,16 @@ We can authenticate to your DB instance using AWS Identity and Access Management
 - The source database remains fully operational during the migration, minimizing downtime to applications that rely on the database.
 - Schema Conversion Tool can copy database schemas for homogenous migrations (same database) and convert schemas for heterogeneous migrations (different database).
 
-# RDS Conversion from Single AZ to Multi AZ
-![ffc002770543960740d3040276f63e09.png](ffc002770543960740d3040276f63e09.png "Title")
+## RDS Conversion from Single AZ to Multi AZ
+- No down time when creating multi AZ from single instance DB. Below steps are performed when we modify single instance DB to multi AZ DB.
+- A snapshot is taken.
+- A new DB is restored from the snapshot in new AZ.
+- Synchronization is established between the two databases.
+
+## Converting unencrypted database to encrypted database
+- Take snapshot of existing unencrypted database.
+- copy snapshort to an encrypted snapshot.
+- Create a new database from that encrypted database.
 
 # Monitoring, Logging and Reporting
 **1. Amazon RDS Events** – Subscribe to Amazon RDS events to be notified when changes occur with a DB instance, DB snapshot, DB parameter group, or DB security group.
@@ -856,3 +868,307 @@ Tape Gateway presents an iSCSI-based virtual tape library (VTL) of virtual tape 
 ![260bb7c8a099fdc266325ffa760c5d72.png](260bb7c8a099fdc266325ffa760c5d72.png "Title")
 
 ![c626d71f5fc007bb33bf54ceba75b60b.png](c626d71f5fc007bb33bf54ceba75b60b.png "Title")
+
+
+# Migration Services
+## AWS Application Discovery Service
+- Helps enterprise customers plan migration projects.
+- Gathers information about the customers on-premises resources.
+- Enable customers to understand the configuration, usuage and behavoir of servers in their IT environments.
+- An **AWS Discovery agent** is required to be installed on on-premise servers or VM to capture system configuration, system performance, running processes etc.
+- It helps to discover technical details of applications running on on-premise data center.
+
+## Database Migration Services
+- Supports both homogenous and heterogenous DB migration.
+
+## AWS Server Migration
+- It is an agent less service that migrates on-premise workloads and resource to AWS.
+- It uses **SMS connector** which can be installed on vCenter to establish connection to AWS resources.
+- Automate, Schedule and track incremental replications of live server volume.
+
+## AWS Migration Hub
+- It helps to track existing servers, plan migration and track the status of each application migration.
+- Provides visibility into application portfolio and streamlines planning and tracking.
+- Shows status of the servers and databases that we are migrating.
+
+## AWS Migration evaluator
+- It is a migration assement service.
+- Helps in AWS cloud planning and migration activities.
+- Provides baseline workloads we are running today.
+- Recommends future state configurations.
+
+## AWS DataSync
+- Online **data transfer** service.
+- Helps in replication of on-premise storage systems and AWS storage services.
+- Copies large amount of data to and from AWS storage services over the internet or AWS Direct Connect.
+- Transfers data from on-premise data center using **DataSync Agent**.
+
+# Data container and ECS
+## Amazon ECS
+The Amazon Elastic Container Service (ECS) is a highly scalable, high performance container management service that supports Docker containers.
+
+It is possible to associate a service on Amazon ECS to an Application Load Balancer (ALB) for the Elastic Load Balancing (ELB) service.
+
+There is no additional charge for Amazon ECS.
+You pay for:
+- Resources created with the EC2 Launch Type (e.g. EC2 instances and EBS volumes).
+- The number and configuration of tasks you run for the Fargate Launch Type.
+
+## ECS Terminology
+**1. Cluster:** Logical Grouping of EC2 Instances.
+**2. Container Instance:** EC2 instance running the ECS agent
+**3. Task Definition:** Blueprint that describes how a docker container should launch.
+**4. Task:** A running container using settings in a Task Definition.
+**5. Service:** Defines long running tasks – can control task count with Auto Scaling and attach an ELB.
+
+## Launch Types
+### Fargate Launch Type
+- The Fargate launch type allows you to run your containerized applications without the need to provision and manage the backend infrastructure. Just register your task definition and Fargate launches the container for you.
+- Fargate Launch Type is a serverless infrastructure managed by AWS.
+- Fargate only supports container images hosted on Elastic Container Registry (ECR) or Docker Hub.
+
+### EC2 Launch Type
+- The EC2 launch type allows you to run your containerized applications on a cluster of Amazon EC2 instances that you manage.
+- Private repositories are only supported by the EC2 Launch Type.
+
+**Images:** These are read-only templates which have the instructions for creating a Docker container. Images are built from a Dockerfile. 
+Images are stored in a registry such as DockerHub or AWS Elastic Container Registry (ECR). ECR supports private Docker repositories with resource-based permissions using AWS IAM to access repositories and images.
+
+## Tasks and Task Definitions
+- A task definition is required to run Docker containers in Amazon ECS.
+- A task definition is a text file in JSON format that describes one or more containers, up to a maximum of 10.
+- Task definitions use Docker images to launch containers.
+- We specify the number of tasks to run (i.e. the number of containers).
+
+### Some of the parameters we can specify in a task definition include:
+1. Which Docker images to use with the containers in your task.
+2. How much CPU and memory to use with each container.
+3. Whether containers are linked together in a task.
+4. The Docker networking mode to use for the containers in your task.
+5. What (if any) ports from the container are mapped to the host container instances.
+6. Whether the task should continue if the container finished or fails.
+7. The commands the container should run when it is started.
+8. Environment variables that should be passed to the container when it starts.
+9. Data volumes that should be used with the containers in the task.
+10. IAM role the task should use for permissions.
+
+**Note:** We can use Amazon ECS Run task to run one or more tasks once.
+
+## Auto Scaling group
+1. Service Auto Scaling
+2. Cluster Auto Scaling
+
+## Service Auto Scaling
+### 1. Target Tracking Scaling Policies
+Increase or decrease the number of tasks that your service runs based on a target value for a specific CloudWatch metric. This is similar to the way that your thermostat maintains the temperature of your home. You select temperature and the thermostat does the rest.
+
+### 2. Step Scaling Policies
+Increase or decrease the number of tasks that your service runs in response to CloudWatch alarms. Step scaling is based on a set of scaling adjustments, known as step adjustments, which vary based on the size of the alarm breach.
+
+### 3. Scheduled Scaling
+Increase or decrease the number of tasks that your service runs based on the date and time.
+
+## Cluster Auto Scaling
+Uses an Amazon ECS resource type called a Capacity Provider. A Capacity Provider can be associated with an EC2 Auto Scaling Group (ASG).
+1. Managed scaling, with an automatically created scaling policy on your ASG, and a new scaling metric (Capacity Provider Reservation) that the scaling policy uses; and
+2. Managed instance termination protection, which enables container-aware termination of instances in the ASG when scale-in happens.
+
+## Security
+- EC2 instances use an IAM role to access ECS.
+- We need to apply IAM roles to container instances before they are launched (EC2 launch type).
+- Security groups attach at the instance or container level.
+
+## Amazon EKS
+- The Amazon Elastic Kubernetes Service (Amazon EKS) is a managed service for running Kubernetes on AWS and on-premises.
+- Amazon EKS can run on Amazon EC2 or AWS Fargate.
+- Amazon EKS automatically manages availability and scalability of Kubernetes API servers and etcd persistence layer.
+- Amazon EKS runs the Kubernetes control plane across three AZs to ensure high availability, and automatically detects and replaces unhealthy control plane nodes.
+
+#### Use case
+The principle use case is when organizations need a consistent control plane for managing containers across hybrid clouds and multicloud environments.
+1. Amazon EKS uses IAM to provide authentication to your Kubernetes cluster, but it still relies on native Kubernetes Role-Based Access Control (RBAC) for authorization.
+2. Access to your cluster using AWS Identity and Access Management (IAM) entities is enabled by the AWS IAM Authenticator for Kubernetes, which runs on the Amazon EKS control plane. 
+3. The authenticator gets its configuration information from the aws-auth ConfigMap (AWS authenticator configuration map).
+
+**Notes**
+We cannot create VPC Endpoints in AWS Wavelength Zones.
+
+# Amazon Virtual Private Cloud (VPC)
+It is a service that lets you launch AWS resources in a logically isolated virtual network that you define. You have complete control over your virtual networking environment, including selection of your own IP address range, creation of subnets, and configuration of route tables and network gateways.
+- Possible to connect the corporate data center to a VPC using a hardware VPN (site-to-site).
+- VPCs are region wide.
+- A default VPC is created in each region with a subnet in each AZ.
+- By default you can create up to 5 VPCs per region.
+
+By default, a new EC2 instance uses an IPv4 addressing protocol. You cannot disable IPv4 support for your VPC and subnets since this is the default IP addressing system for Amazon VPC and Amazon EC2.
+
+1. A primary private IPv4 address from the IPv4 address range of your VPC
+2. One or more secondary private IPv4 addresses from the IPv4 address range of your VPC
+3. One Elastic IP address (IPv4) per private IPv4 address
+4. One public IPv4 address
+5. One or more IPv6 addresses
+6. One or more security groups
+7. A MAC address
+8. A source/destination check flag
+9.  A description
+
+For Eg: If you deploy a new Amazon EC2 instance and receive an error saying that there is no IP address available on the subnet. Then you need to setup a new IPv4 subnet with a larger CIDR range, associate the new subnet with VPC and then launch new instance.
+
+## Components of a VPC
+### 1. A Virtual Private Cloud
+A logically isolated virtual network in the AWS cloud. You define a VPC’s IP address space from ranges you select.
+
+### 2. Subnet
+A segment of a VPC’s IP address range where you can place groups of isolated resources (maps to an AZ, 1:1).
+
+### 3. Internet Gateway
+The Amazon VPC side of a connection to the public Internet.
+
+### 4. NAT Gateway
+A highly available, managed Network Address Translation (NAT) service for your resources in a private subnet to access the Internet.
+
+### 5. Hardware VPN Connection
+A hardware-based VPN connection between your Amazon VPC and your datacenter, home network, or co-location facility.
+
+### 6. Virtual Private Gateway
+The Amazon VPC side of a VPN connection.
+
+### 7. Customer Gateway
+Your side of a VPN connection.
+
+### 8. Router
+Routers interconnect subnets and direct traffic between Internet gateways, virtual private gateways, NAT gateways, and subnets.
+
+### 9. Peering Connection
+A peering connection enables you to route traffic via private IP addresses between two peered VPCs.
+
+### 10. VPC Endpoints
+Enables private connectivity to services hosted in AWS, from within your VPC without using an Internet Gateway, VPN, Network Address Translation (NAT) devices, or firewall proxies.
+
+### 11. Egress-only Internet Gateway
+A stateful gateway to provide egress only access for IPv6 traffic from the VPC to the Internet.
+
+## Subnets
+- The first 4 and last 1 IP addresses in a subnet are reserved.
+For example, in a subnet with CIDR block 10.0.0.0/24, the following five IP addresses are reserved:
+10.0.0.0: Network address.
+10.0.0.1: Reserved by AWS for the VPC route.
+10.0.0.2: Reserved by AWS.
+10.0.0.3: Reserved by AWS for future use.
+10.0.0.255: Network broadcast address (broadcast not supported).
+- Subnets are created within availability zones (AZs).
+- Each subnet must reside entirely within one Availability Zone and cannot span zones.
+- You can only attach one Internet gateway to a custom VPC.
+IPv6 addresses are all public and the range is allocated by AWS.
+
+## VPC Connectivity
+1. AWS Managed VPN.
+2. AWS Direct Connect.
+3. AWS Direct Connect plus a VPN.
+4. AWS VPN CloudHub.
+5. Software VPN.
+6. Transit VPC.
+7. VPC Peering.
+8. AWS PrivateLink.
+9. VPC Endpoints.
+
+## AWS managed VPN
+AWS-provided network connectivity between two VPCs. It uses AWS backbone without traversing the public internet.
+
+Multiple VPCs can communicate or access each other’s resources. 
+![f023f4a7743e73acb6f7a627ac73bf90.png](f023f4a7743e73acb6f7a627ac73bf90.png "Title")
+
+## Setup
+- A **Virtual Private Gateway (VGW)** is required on the AWS side and a **Customer Gateway** is required on the customer side.
+- An Internet routable IP address is required on the customer gateway.
+- Two tunnels per connection must be configured for redundancy.
+- Cannot access Elastic IPs on your VPC via the VPN – Elastic IPs can only be connected to via the Internet.
+- You cannot use a NAT gateway in AWS for clients coming in via a VPN.
+
+## AWS Direct Connect
+AWS Direct Connect makes it easy to establish a dedicated connection from an on-premises network to Amazon VPC. Using AWS Direct Connect, you can establish private connectivity between AWS and your data center, office, or collocated environment. This private connection can reduce network costs, increase bandwidth throughput, and provide a more consistent network experience than internet-based connections.
+- AWS Direct Connect lets you establish 1 Gbps or 10 Gbps dedicated network connections (or multiple connections) between AWS networks and one of the AWS Direct Connect locations.
+- AWS Direct Connect does not encrypt your traffic that is in transit.
+- You can use the encryption options for the services that traverse AWS Direct Connect.
+
+![8243e7f05c9013fbbcaa29ab605771b6.png](8243e7f05c9013fbbcaa29ab605771b6.png "Title")
+
+## AWS Direct Connect Plus VPN
+With AWS Direct Connect plus VPN, you can combine one or more AWS Direct Connect dedicated network connections with the Amazon VPC VPN.
+
+You can use AWS Direct Connect to establish a dedicated network connection between your network create a logical connection to public AWS resources, such as an Amazon virtual private gateway IPsec endpoint.
+
+## AWS VPN CloudHub
+If you have more than one remote network (for example, multiple branch offices), you can create multiple AWS Site-to-Site VPN connections via your virtual private gateway to enable communication between these networks. 
+
+Hourly rates plus data egress charges.
+
+## Software VPN
+Amazon VPC offers you the flexibility to fully manage both sides of your Amazon VPC connectivity by creating a VPN connection between your remote network and a software VPN appliance running in your Amazon VPC network.
+
+This option is recommended if you must manage both ends of the VPN connection either for compliance purposes or for leveraging gateway devices that are not currently supported by Amazon VPC’s VPN solution.
+
+## Transit VPC
+A transit VPC is a common strategy for connecting multiple, geographically disperse VPCs and remote networks to create a global network transit center.
+
+A transit VPC simplifies network management and minimizes the number of connections required to connect multiple VPCs and remote networks.
+
+## VPC Peering
+- A VPC peering connection is a networking connection between two VPCs that enables you to route traffic between them using private IPv4 addresses or IPv6 addresses.
+- Instances in either VPC can communicate with each other as if they are within the same network.
+- The VPCs can be in different regions (also known as an inter-region VPC peering connection).
+- Data sent between VPCs in different regions is encrypted (traffic charges apply).
+- Limits are 50 VPC peers per VPC, up to 125 by request.
+- Must update route tables to configure routing.
+- Must update the inbound and outbound rules for VPC security group to reference security groups in the peered VPC.
+
+## AWS PrivateLink
+AWS PrivateLink simplifies the security of data shared with cloud-based applications by eliminating the exposure of data to the public Internet.
+
+AWS PrivateLink provides private connectivity between VPCs, AWS services, and on-premises applications, securely on the Amazon network.
+
+### For inter-region VPC peering there are some limitations
+1. You cannot create a security group rule that references a peer security group.
+2. Cannot enable DNS resolution.
+3. Maximum MTU is 1500 bytes (no jumbo frames support).
+4. Limited region support.
+
+## VPC Endpoint
+A VPC endpoint enables connections between a virtual private cloud (VPC) and supported services, without requiring that you use an internet gateway, NAT device, VPN connection, or AWS Direct Connect connection. 
+
+## Gateway Endpoints
+A gateway endpoint is a gateway that is a target for a route in your route table used for traffic destined to either Amazon S3 or DynamoDB. There is no charge for using gateway endpoints.
+
+![f406daca37abc0c7c26b461501ff7874.png](f406daca37abc0c7c26b461501ff7874.png "Title")
+
+- By default, IAM users do not have permission to work with endpoints.
+- You can create an IAM user policy that grants users the permissions to create, modify, describe, and delete endpoints.
+
+**Gateway endpoints are only available for:**
+- Amazon DynamoDB
+- Amazon S3
+
+## AWS Network Firewall
+It is a stateful, managed, network firewall, and intrusion detection and prevention service for your virtual private cloud (VPC). With Network Firewall, you can filter traffic at the perimeter of your VPC. This includes traffic going to and coming from an internet gateway, NAT gateway, or over VPN or AWS Direct Connect. Network Firewall uses Suricata.
+
+## VPC Flow Logs
+Flow Logs capture information about the IP traffic going to and from network interfaces in a VPC.
+
+Flow log data is stored using Amazon CloudWatch Logs.
+
+Flow logs can be created at the following levels:
+- VPC.
+- Subnet.
+- Network interface.
+
+Not all traffic is monitored, e.g. the following traffic is excluded:
+1. Traffic that goes to Route53.
+2. Traffic generated for Windows license activation.
+3. Traffic to and from 169.254.169.254 (instance metadata).
+4. Traffic to and from 169.254.169.123 for the Amazon Time Sync Service.
+5. DHCP traffic.
+6. Traffic to the reserved IP address for the default VPC router.
+
+## High Availability Approaches for Networking
+- Direct Connect is not HA by default, so you need to establish a secondary connection via another Direct Connect (ideally with another provider) or use a VPN.
+- For Multi-AZ redundancy of NAT Gateways, create gateways in each AZ with routes for private subnets to use the local gateway.
